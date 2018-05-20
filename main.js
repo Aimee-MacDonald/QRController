@@ -50,10 +50,43 @@ ipc.on("configuration", (event, args) => {
 });
 
 ipc.on("testing", (event, args) => {
-  if(args === "back"){
-    setWindow("start");
+  switch (args){
+    case "back":
+      setWindow("start");
+      break;
+
+    case "scan":
+      setWindow("testScan");
+      break;
+
+    case "database":
+      setWindow("testDatabase");
+      break;
+
+    case "relays":
+      setWindow("testRelays");
+      break;
   }
 });
+
+ipc.on("testScan", (event, args) => {
+  if(args === "back"){
+    setWindow("testing");
+  }
+});
+
+ipc.on("testDatabase", (event, args) => {
+  if(args === "back"){
+    setWindow("testing");
+  }
+});
+
+ipc.on("testRelays", (event, args) => {
+  if(args === "back"){
+    setWindow("testing");
+  }
+});
+
 
 function setWindow(windowName){
   mainWindow.loadURL(url.format({
