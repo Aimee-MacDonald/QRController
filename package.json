@@ -1,0 +1,22 @@
+{
+  "name": "qrcontroller",
+  "version": "1.0.0",
+  "description": "Scan QR Codes to Control Relay Switches",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aimee-MacDonald/QRController.git"
+  },
+  "author": "Aimee MacDonald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aimee-MacDonald/QRController/issues"
+  },
+  "homepage": "https://github.com/Aimee-MacDonald/QRController#readme",
+  "devDependencies": {
+    "electron": "^2.0.1"
+  }
+}
