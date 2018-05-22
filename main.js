@@ -92,6 +92,8 @@ ipc.on("testDatabase", (event, args) => {
 ipc.on("testRelays", (event, args) => {
   if(args === "back"){
     setWindow("testing");
+  } else {
+    console.log(args);
   }
 });
 
