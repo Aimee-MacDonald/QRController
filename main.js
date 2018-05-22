@@ -21,7 +21,7 @@ let config = {
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", function(){
     mainWindow = null;
@@ -37,7 +37,11 @@ app.on("window-all-closed", function(){
 ipc.on("check-config", (event, args) => {
   if(!config.initialised){
     if(fs.existsSync("config.txt")){
-      console.log("EXISTS!");
+      let filedata = fs.readFileSync("config.txt", "utf8");
+      filedata = JSON.parse(filedata);
+      cte_1_a_7 = filedata.cte_1_a_7;
+      cte_8_a_9 = filedata.cte_8_a_9;
+      port = filedata.port;
     } else {
       dialog.showMessageBox(mainWindow, {
         "type": "info",
