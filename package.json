@@ -4,7 +4,8 @@
   "description": "Scan QR Codes to Control Relay Switches",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "rebuild": "electron-rebuild -f -w serialport"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,10 @@
   },
   "homepage": "https://github.com/Aimee-MacDonald/QRController#readme",
   "devDependencies": {
-    "electron": "^2.0.1"
+    "electron": "^2.0.1",
+    "electron-rebuild": "^1.7.3"
+  },
+  "dependencies": {
+    "serialport": "^6.2.0"
   }
 }

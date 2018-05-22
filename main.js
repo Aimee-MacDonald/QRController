@@ -2,29 +2,53 @@ const electron = require("electron");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
+const dialog = electron.dialog;
+const serialport = require("serialport").SerialPort;
 
 const path = require('path');
 const url = require('url');
 const fs = require("fs");
 
 let mainWindow;
-let cte_1_a_7;
-let cte_8_a_9;
+
+let config = {
+  "initialised": false,
+  "cte_1_a_7": "",
+  "cte_8_a_9": "",
+  "port": ""
+};
 
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
   mainWindow.webContents.openDevTools();
 
-  setWindow("start");
-
   mainWindow.on("closed", function(){
     mainWindow = null;
   });
+
+  setWindow("start");
 });
 
 app.on("window-all-closed", function(){
   app.quit();
+});
+
+ipc.on("check-config", (event, args) => {
+  if(!config.initialised){
+    if(fs.existsSync("config.txt")){
+      console.log("EXISTS!");
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        "type": "info",
+        "buttons": ["OK", "Cancel"],
+        "title": "No Configuration",
+        "message": "Please reconfigure your software"
+      }, (response) => {
+        if(response === 0) setWindow("configuration");
+      });
+    }
+  }
 });
 
 ipc.on("start", (event, args) => {
@@ -149,6 +173,10 @@ function validateCode(code){
        codeData.error = 5;
        return codeData;
   }
+}
+
+function initialise(){
+  console.log("Initialising");
 }
 
 function setWindow(windowName){
