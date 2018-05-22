@@ -10,7 +10,7 @@ let mainWindow;
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   setWindow("start");
 
@@ -72,6 +72,8 @@ ipc.on("testing", (event, args) => {
 ipc.on("testScan", (event, args) => {
   if(args === "back"){
     setWindow("testing");
+  } else {
+    event.sender.send("scan-success", args);
   }
 });
 
