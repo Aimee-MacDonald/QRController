@@ -14,7 +14,6 @@ let mainWindow;
 let config = {
   "initialised": false,
   "cte_1_a_7": "",
-  "cte_8_a_9": "",
   "port": ""
 };
 
@@ -32,27 +31,6 @@ app.on("ready", () => {
 
 app.on("window-all-closed", function(){
   app.quit();
-});
-
-ipc.on("check-config", (event, args) => {
-  if(!config.initialised){
-    if(fs.existsSync("config.txt")){
-      let filedata = fs.readFileSync("config.txt", "utf8");
-      filedata = JSON.parse(filedata);
-      cte_1_a_7 = filedata.cte_1_a_7;
-      cte_8_a_9 = filedata.cte_8_a_9;
-      port = filedata.port;
-    } else {
-      dialog.showMessageBox(mainWindow, {
-        "type": "info",
-        "buttons": ["OK", "Cancel"],
-        "title": "No Configuration",
-        "message": "Please reconfigure your software"
-      }, (response) => {
-        if(response === 0) setWindow("configuration");
-      });
-    }
-  }
 });
 
 ipc.on("start", (event, args) => {
@@ -75,9 +53,31 @@ ipc.on("start", (event, args) => {
   }
 });
 
+ipc.on("check-config", (event, args) => {
+  if(!config.initialised){
+    if(fs.existsSync("config.txt")){
+      let filedata = fs.readFileSync("config.txt", "utf8");
+      filedata = JSON.parse(filedata);
+      cte_1_a_7 = filedata.cte_1_a_7;
+      port = filedata.port;
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        "type": "info",
+        "buttons": ["OK", "Cancel"],
+        "title": "No Configuration",
+        "message": "Please reconfigure your software"
+      }, (response) => {
+        if(response === 0) setWindow("configuration");
+      });
+    }
+  }
+});
+
 ipc.on("configuration", (event, args) => {
   if(args === "back"){
     setWindow("start");
+  } else {
+    fs.writeFileSync("config.txt", JSON.stringify(args));
   }
 });
 
@@ -177,10 +177,6 @@ function validateCode(code){
        codeData.error = 5;
        return codeData;
   }
-}
-
-function initialise(){
-  console.log("Initialising");
 }
 
 function setWindow(windowName){
