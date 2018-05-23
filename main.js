@@ -176,6 +176,7 @@ function validateCode(code){
 
   // err 1: Check DB
 
+
   // err 2: Between 15 and 100
   if(code.length < 15 || code.length > 100){
     codeData.valid = false;
