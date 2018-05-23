@@ -4,6 +4,7 @@ const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 const dialog = electron.dialog;
 const serialport = require("serialport").SerialPort;
+const mongoose = require("mongoose");
 
 const path = require('path');
 const url = require('url');
@@ -22,7 +23,7 @@ let config = {
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", function(){
     mainWindow = null;
@@ -121,7 +122,6 @@ function setWindow(windowName){
 function initialise(){
   if(!config.initialised){
     if(fs.existsSync("config.txt")){
-      // Read Config File
       let filedata = fs.readFileSync("config.txt", "utf8");
       filedata = JSON.parse(filedata);
       config.initialised = true;
@@ -142,10 +142,18 @@ function initialise(){
   }
 
   if(config.initialised){
-    // Connect to DB
-    console.log("Connect to DB");
-    console.log("DBUN: " + config.dbun);
-    console.log("DBPW: " + config.dbpw);
+    mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller", (err, db) => {
+      if(err){
+        dialog.showMessageBox(mainWindow, {
+          "type": "error",
+          "buttons": ["OK"],
+          "title": "Database Error",
+          "message": "Unable to connect to the database\nPlease check your username and password"
+        }, (response) => {
+          if(response === 0) setWindow("configuration");
+        });
+      }
+    });
 
     // Connect to Relay Card
     console.log("Connect to Relay Card");
