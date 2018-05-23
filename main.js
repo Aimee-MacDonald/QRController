@@ -27,6 +27,7 @@ app.on("ready", () => {
   });
 
   setWindow("start");
+  initialise();
 });
 
 app.on("window-all-closed", function(){
@@ -53,31 +54,16 @@ ipc.on("start", (event, args) => {
   }
 });
 
-ipc.on("check-config", (event, args) => {
-  if(!config.initialised){
-    if(fs.existsSync("config.txt")){
-      let filedata = fs.readFileSync("config.txt", "utf8");
-      filedata = JSON.parse(filedata);
-      cte_1_a_7 = filedata.cte_1_a_7;
-      port = filedata.port;
-    } else {
-      dialog.showMessageBox(mainWindow, {
-        "type": "info",
-        "buttons": ["OK", "Cancel"],
-        "title": "No Configuration",
-        "message": "Please reconfigure your software"
-      }, (response) => {
-        if(response === 0) setWindow("configuration");
-      });
-    }
-  }
-});
-
 ipc.on("configuration", (event, args) => {
   if(args === "back"){
     setWindow("start");
   } else {
     fs.writeFileSync("config.txt", JSON.stringify(args));
+    config.initialised = true;
+    config.cte_1_a_7 = args.cte_1_a_7;
+    config.port = args.port;
+    setWindow("start");
+    initialise();
   }
 });
 
@@ -124,6 +110,42 @@ ipc.on("testRelays", (event, args) => {
     console.log(args);
   }
 });
+
+function setWindow(windowName){
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, "views/" + windowName + ".html"),
+    protocol: 'file:',
+    slashes: true
+  }));
+}
+
+function initialise(){
+  if(!config.initialised){
+    if(fs.existsSync("config.txt")){
+      // Read Config File
+      let filedata = fs.readFileSync("config.txt", "utf8");
+      filedata = JSON.parse(filedata);
+      cte_1_a_7 = filedata.cte_1_a_7;
+      port = filedata.port;
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        "type": "info",
+        "buttons": ["OK", "Cancel"],
+        "title": "No Configuration",
+        "message": "Please reconfigure your software"
+      }, (response) => {
+        if(response === 0) setWindow("configuration");
+      });
+    }
+  }
+
+  if(config.initialised){
+    // Connect to DB
+    console.log("Connect to DB");
+    // Connect to Relay Card
+    console.log("Connect to Relay Card");
+  }
+}
 
 function validateCode(code){
   let codeData = {
@@ -177,12 +199,4 @@ function validateCode(code){
        codeData.error = 5;
        return codeData;
   }
-}
-
-function setWindow(windowName){
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, "views/" + windowName + ".html"),
-    protocol: 'file:',
-    slashes: true
-  }));
 }

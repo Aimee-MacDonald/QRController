@@ -12,7 +12,3 @@ function testing(){
 function start(){
   ipc.send("start", "start");
 }
-
-window.onload = () => {
-  ipc.send("check-config", "");
-};
