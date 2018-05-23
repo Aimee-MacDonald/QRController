@@ -14,13 +14,15 @@ let mainWindow;
 let config = {
   "initialised": false,
   "cte_1_a_7": "",
-  "port": ""
+  "port": "",
+  "dbun": "",
+  "dbpw": ""
 };
 
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", function(){
     mainWindow = null;
@@ -59,9 +61,6 @@ ipc.on("configuration", (event, args) => {
     setWindow("start");
   } else {
     fs.writeFileSync("config.txt", JSON.stringify(args));
-    config.initialised = true;
-    config.cte_1_a_7 = args.cte_1_a_7;
-    config.port = args.port;
     setWindow("start");
     initialise();
   }
@@ -125,8 +124,11 @@ function initialise(){
       // Read Config File
       let filedata = fs.readFileSync("config.txt", "utf8");
       filedata = JSON.parse(filedata);
-      cte_1_a_7 = filedata.cte_1_a_7;
-      port = filedata.port;
+      config.initialised = true;
+      config.cte_1_a_7 = filedata.cte_1_a_7;
+      config.port = filedata.port;
+      config.dbun = filedata.dbun;
+      config.dbpw = filedata.dbpw;
     } else {
       dialog.showMessageBox(mainWindow, {
         "type": "info",
@@ -142,6 +144,9 @@ function initialise(){
   if(config.initialised){
     // Connect to DB
     console.log("Connect to DB");
+    console.log("DBUN: " + config.dbun);
+    console.log("DBPW: " + config.dbpw);
+
     // Connect to Relay Card
     console.log("Connect to Relay Card");
   }
