@@ -13,6 +13,7 @@ document.getElementById("input-form").addEventListener("submit", (e) => {
   if(e.preventDefault) e.preventDefault();
 
   let scannedCode = document.getElementById("scanner-input").value;
+  document.getElementById("scanner-input").value = "";
 
   ipc.send("testDatabase", scannedCode);
 
@@ -23,8 +24,6 @@ ipc.on("scan-validated", function(event, args){
   document.getElementById("code-validation").value = "";
 
   for (var key in args) {
-    if (args.hasOwnProperty(key)) {
-      document.getElementById("code-validation").value += "\n" + (key + ": " + args[key]);
-    }
+    document.getElementById("code-validation").value += "\n" + (key + ": " + args[key]);
   }
 });

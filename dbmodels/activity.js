@@ -14,4 +14,4 @@ var schema = new Schema({
   "NotificationEmail2": {type: String, required: true}
 });
 
-module.exports = mongoose.model("Message", schema);
+module.exports = mongoose.model("Activity", schema);

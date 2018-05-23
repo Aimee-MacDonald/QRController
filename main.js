@@ -5,16 +5,18 @@ const ipc = electron.ipcMain;
 const dialog = electron.dialog;
 const serialport = require("serialport").SerialPort;
 const mongoose = require("mongoose");
-
 const path = require('path');
 const url = require('url');
 const fs = require("fs");
+
+const Activity = require(__dirname + "/dbmodels/activity");
 
 let mainWindow;
 
 let config = {
   "initialised": false,
   "cte_1_a_7": "",
+  "cte_8_a_9": "",
   "port": "",
   "dbun": "",
   "dbpw": ""
@@ -23,7 +25,7 @@ let config = {
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", function(){
     mainWindow = null;
@@ -126,6 +128,7 @@ function initialise(){
       filedata = JSON.parse(filedata);
       config.initialised = true;
       config.cte_1_a_7 = filedata.cte_1_a_7;
+      config.cte_8_a_9 = filedata.cte_8_a_9;
       config.port = filedata.port;
       config.dbun = filedata.dbun;
       config.dbpw = filedata.dbpw;
@@ -168,15 +171,6 @@ function validateCode(code){
     "error": 0
   }
 
-  if(!cte_1_a_7 || !cte_8_a_9){
-    codeData.valid = false;
-    codeData.msgtexto_aid = "No configuration data found";
-    return codeData;
-  }
-
-  // err 1: Check DB
-
-
   // err 2: Between 15 and 100
   if(code.length < 15 || code.length > 100){
     codeData.valid = false;
@@ -186,7 +180,7 @@ function validateCode(code){
   }
 
   // err 3: 1 to 7 = "NLE0000" (cte_1_a_7)
-  if(code.substring(0, 7) !== cte_1_a_7){
+  if(code.substring(0, 7) !== config.cte_1_a_7){
     codeData.valid = false;
     codeData.msgtexto_aid = "Invalid \'cte_1_a_7\'";
     codeData.error = 3;
@@ -194,7 +188,7 @@ function validateCode(code){
   }
 
   // err 4: 8 to 9 = "01" (cte_8_a_9)
-  if(code.substring(7, 9) !== cte_8_a_9){
+  if(code.substring(7, 9) !== config.cte_8_a_9){
     codeData.valid = false;
     codeData.msgtexto_aid = "Invalid \'cte_8_a_9\'";
     codeData.error = 4;
@@ -203,7 +197,6 @@ function validateCode(code){
 
   // err 5: 14 to 15 = Relay Channel (01 to 04)
   let channel = code.substring(13, 15);
-  console.log(channel);
   if(channel !== "01" &&
      channel !== "02" &&
      channel !== "03" &&
