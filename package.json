@@ -22,7 +22,7 @@
     "electron-rebuild": "^1.7.3"
   },
   "dependencies": {
-    "mongo": "0.1.0",
+    "mongodb": "3.1.0-beta4",
     "mongoose": "5.1.2",
     "serialport": "^6.2.0"
   }

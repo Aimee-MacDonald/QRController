@@ -4,14 +4,14 @@ const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 const dialog = electron.dialog;
 const serialport = require("serialport").SerialPort;
-const mongoose = require("mongoose");
 const path = require('path');
 const url = require('url');
 const fs = require("fs");
-
-const Activity = require(__dirname + "/dbmodels/activity");
+const mongoose = require("mongoose");
+const Activity = require(__dirname + "/dbmodels/activity.js");
 
 let mainWindow;
+let db;
 
 let config = {
   "initialised": false,
@@ -144,20 +144,9 @@ function initialise(){
     }
   }
 
-  if(config.initialised){
-    mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller", (err, db) => {
-      if(err){
-        dialog.showMessageBox(mainWindow, {
-          "type": "error",
-          "buttons": ["OK"],
-          "title": "Database Error",
-          "message": "Unable to connect to the database\nPlease check your username and password"
-        }, (response) => {
-          if(response === 0) setWindow("configuration");
-        });
-      }
-    });
+  db = mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller");
 
+  if(config.initialised){
     // Connect to Relay Card
     console.log("Connect to Relay Card");
   }
@@ -206,4 +195,16 @@ function validateCode(code){
        codeData.error = 5;
        return codeData;
   }
+
+  // err 1: Code not in the Database / Max Uses
+  Activity.findOne({"QRCode": code}, (err, doc) => {
+    if(err) console.log("err: " + err);
+
+    codeData.channel = code.substring(13, 15);
+    codeData.valid = true;
+    codeData.msgtexto_aid = doc.TimesToUse + " uses remaining";
+    codeData.error = 0;
+
+    mainWindow.webContents.send("scan-validated", codeData);
+  });
 }
