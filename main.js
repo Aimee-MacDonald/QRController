@@ -3,7 +3,7 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 const dialog = electron.dialog;
-const serialport = require("serialport").SerialPort;
+const SerialPort = require("serialport");
 const path = require('path');
 const url = require('url');
 const fs = require("fs");
@@ -12,6 +12,7 @@ const Activity = require(__dirname + "/dbmodels/activity.js");
 
 let mainWindow;
 let db;
+let relayCard;
 
 let config = {
   "initialised": false,
@@ -109,7 +110,7 @@ ipc.on("testRelays", (event, args) => {
   if(args === "back"){
     setWindow("testing");
   } else {
-    console.log(args);
+    console.log("Lets Play Relay");
   }
 });
 
@@ -144,11 +145,11 @@ function initialise(){
     }
   }
 
-  db = mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller");
-
   if(config.initialised){
-    // Connect to Relay Card
-    console.log("Connect to Relay Card");
+    db = mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller");
+
+    relayCard = new SerialPort(config.port,{baudRate: 19200}, false);
+    console.log(relayCard);
   }
 }
 
