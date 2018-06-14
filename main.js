@@ -121,13 +121,28 @@ ipc.on("scanning", (event, args) => {
 
   event.sender.send("validationResponse", validationData);
 
-  console.log(validationData);
-
   if(validationData.valid){
-    //Please Wait
+
     //Reduce DB
-    //Activate Relay
-    console.log("Valid!");
+
+    Activity.findOne({"QRCode": args}, (err, doc) => {
+      if(err) throw err;
+
+      if(doc.TimesToUse > 0){
+        doc.TimesToUse -= 1;
+        if(doc.TimesToUse === 0){
+          console.log("Last Use");
+          doc.EndDateTime = Date.now();
+        }
+        doc.save();
+
+        //Activate Relay
+
+      } else {
+        console.log("No More Use");
+        // Report Error
+      }
+    });
   }
 });
 
@@ -216,19 +231,3 @@ function validateCode(code){
 
   return codeData;
 }
-
-
-/*
-// err 1: Code not in the Database / Max Uses
-Activity.findOne({"QRCode": code}, (err, doc) => {
-  if(err) console.log("err: " + err);
-
-  codeData.channel = code.substring(13, 15);
-  codeData.valid = true;
-  codeData.msgtexto_aid = doc.TimesToUse + " uses remaining";
-  codeData.error = 0;
-
-  mainWindow.webContents.send("scan-validated", codeData);
-  return codeData;
-});
-*/
