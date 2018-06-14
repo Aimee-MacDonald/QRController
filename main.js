@@ -26,7 +26,7 @@ let config = {
 app.on("ready", () => {
   mainWindow = new BrowserWindow({width: 800, height: 600});
   mainWindow.setMenu(null);
-  
+
   //mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", function(){
@@ -112,6 +112,20 @@ ipc.on("testRelays", (event, args) => {
     setWindow("testing");
   } else {
     console.log("Lets Play Relay");
+  }
+});
+
+ipc.on("scanning", (event, args) => {
+  console.log("kdfjk: " + args);
+  let validationData = validateCode(args);
+
+  if(validationData.valid){
+    //Please Wait
+    //Reduce DB
+    //Activate Relay
+    console.log("Valid!");
+  } else {
+    event.sender.send("validationResponse", validationData);
   }
 });
 
