@@ -119,13 +119,15 @@ ipc.on("scanning", (event, args) => {
   console.log("kdfjk: " + args);
   let validationData = validateCode(args);
 
+  event.sender.send("validationResponse", validationData);
+
+  console.log(validationData);
+
   if(validationData.valid){
     //Please Wait
     //Reduce DB
     //Activate Relay
     console.log("Valid!");
-  } else {
-    event.sender.send("validationResponse", validationData);
   }
 });
 
@@ -163,7 +165,7 @@ function initialise(){
   if(config.initialised){
     db = mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller");
 
-    relayCard = new SerialPort(config.port,{baudRate: 19200}, false);
+    //relayCard = new SerialPort(config.port,{baudRate: 19200}, false);
     console.log(relayCard);
   }
 }
@@ -171,7 +173,7 @@ function initialise(){
 function validateCode(code){
   let codeData = {
     "valid": true,
-    "msgtexto_aid": "",
+    "msgtexto_aid": "Please wait",
     "channel": 0,
     "error": 0
   }
@@ -212,15 +214,21 @@ function validateCode(code){
        return codeData;
   }
 
-  // err 1: Code not in the Database / Max Uses
-  Activity.findOne({"QRCode": code}, (err, doc) => {
-    if(err) console.log("err: " + err);
-
-    codeData.channel = code.substring(13, 15);
-    codeData.valid = true;
-    codeData.msgtexto_aid = doc.TimesToUse + " uses remaining";
-    codeData.error = 0;
-
-    mainWindow.webContents.send("scan-validated", codeData);
-  });
+  return codeData;
 }
+
+
+/*
+// err 1: Code not in the Database / Max Uses
+Activity.findOne({"QRCode": code}, (err, doc) => {
+  if(err) console.log("err: " + err);
+
+  codeData.channel = code.substring(13, 15);
+  codeData.valid = true;
+  codeData.msgtexto_aid = doc.TimesToUse + " uses remaining";
+  codeData.error = 0;
+
+  mainWindow.webContents.send("scan-validated", codeData);
+  return codeData;
+});
+*/
