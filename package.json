@@ -12,7 +12,11 @@
     "type": "git",
     "url": "git+https://github.com/Aimee-MacDonald/QRController.git"
   },
-  "author": "Aimee MacDonald",
+  "author": {
+    "name": "Aimee MacDonald",
+    "email": "aimeelmacdonald@gmail.com",
+    "url": "http://www.bleebloop.xyz"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Aimee-MacDonald/QRController/issues"
@@ -20,6 +24,7 @@
   "homepage": "https://github.com/Aimee-MacDonald/QRController#readme",
   "devDependencies": {
     "electron": "^2.0.1",
+    "electron-builder": "^20.15.1",
     "electron-rebuild": "^1.7.3"
   },
   "dependencies": {
