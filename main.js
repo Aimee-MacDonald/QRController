@@ -116,15 +116,12 @@ ipc.on("testRelays", (event, args) => {
 });
 
 ipc.on("scanning", (event, args) => {
-  console.log("kdfjk: " + args);
+  console.log("Code: " + args);
   let validationData = validateCode(args);
 
   event.sender.send("validationResponse", validationData);
 
   if(validationData.valid){
-
-    //Reduce DB
-
     Activity.findOne({"QRCode": args}, (err, doc) => {
       if(err) throw err;
 
@@ -137,10 +134,27 @@ ipc.on("scanning", (event, args) => {
         doc.save();
 
         //Activate Relay
+        relayCard.open(err => {
+          if(err) throw err;
 
-      } else {
-        console.log("No More Use");
-        // Report Error
+          // Write to Port
+          relayCard.write("relay on " + validationData.channel + "\r", (err, results) => {
+            if(err) throw err;
+          });
+
+          // Wait 10 Seconds
+
+          setTimeout(
+            function(){
+              relayCard.write("relay off " + validationData.channel + "\r", (err, results) => {
+                if(err) throw err;
+              });
+
+              event.sender.send("reset", true);
+            }, 2000);
+          });
+        } else {
+        event.sender.send("reset", false);
       }
     });
   }
@@ -179,9 +193,7 @@ function initialise(){
 
   if(config.initialised){
     db = mongoose.connect("mongodb://" + config.dbun + ":" + config.dbpw + "@ds133570.mlab.com:33570/qr-controller");
-
-    //relayCard = new SerialPort(config.port,{baudRate: 19200}, false);
-    console.log(relayCard);
+    relayCard = new SerialPort(config.port,{baudRate: 19200}, false);
   }
 }
 

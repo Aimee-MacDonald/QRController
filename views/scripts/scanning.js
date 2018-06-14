@@ -18,3 +18,11 @@ document.getElementById("input-form").addEventListener("submit", (e) => {
 ipc.on("validationResponse", function(event, args){
   document.getElementById("response").innerText = args.msgtexto_aid;
 });
+
+ipc.on("reset", function(event, args){
+  if(args === false){
+    document.getElementById("response").innerText = "Code Expired";
+  } else {
+    console.log("Ooh, what happened?");
+  }
+});
